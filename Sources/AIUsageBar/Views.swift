@@ -123,9 +123,9 @@ struct UsagePanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Usage").font(.system(size: 23, weight: .semibold, design: .rounded))
-                    Text("CLAUDE · CODEX · 額度監控").font(.system(size: 11, weight: .medium)).tracking(1.2).foregroundStyle(Theme.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Usage").font(.system(size: 19, weight: .semibold, design: .rounded))
+                    Text("CLAUDE · CODEX · 額度監控").font(.system(size: 10, weight: .medium)).tracking(1.0).foregroundStyle(Theme.secondary)
                 }
                 Spacer()
                 Button { store.refresh(force: true) } label: {
@@ -133,13 +133,13 @@ struct UsagePanel: View {
                     else { Image(systemName: "arrow.clockwise").frame(width: 16, height: 16) }
                 }.buttonStyle(GlassButtonStyle()).disabled(store.loading || store.preview)
                     .help("立即更新").accessibilityLabel("立即更新 Claude 與 Codex 額度")
-            }.padding(20)
+            }.padding(.horizontal, 16).padding(.top, 14).padding(.bottom, 10)
             ScrollView {
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     ForEach(Provider.allCases) { ProviderCard(store: store, provider: $0) }
-                }.padding(.horizontal, 16).padding(.vertical, 6)
-            }.frame(maxHeight: 530)
-            VStack(alignment: .leading, spacing: 8) {
+                }.padding(.horizontal, 12).padding(.vertical, 4)
+            }.frame(maxHeight: 420)
+            VStack(alignment: .leading, spacing: 6) {
                 if let date = store.latestCapture {
                     HStack(spacing: 5) {
                         Image(systemName: "clock")
@@ -156,9 +156,9 @@ struct UsagePanel: View {
                     Spacer()
                     Button("結束") { NSApp.terminate(nil) }.keyboardShortcut("q")
                 }.buttonStyle(.borderless).font(.system(size: 12))
-            }.padding(14).glass(cornerRadius: 14, material: nil, elevated: false, liquid: true, clear: true).padding(12)
+            }.padding(.horizontal, 12).padding(.vertical, 10).glass(cornerRadius: 14, material: nil, elevated: false, liquid: true, clear: true).padding(10)
         }
-        .frame(width: 390)
+        .frame(width: 330)
         .background(GlassBackdrop().ignoresSafeArea())
     }
 }
@@ -170,24 +170,24 @@ struct ProviderCard: View {
     var tint: Color { provider == .claude ? .orange : .blue }
     var body: some View {
         let stale = state.stale(maxAge: max(120, store.interval * 2 + 60))
-        VStack(alignment: .leading, spacing: 16) {
-            HStack(spacing: 10) {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
                 Button { NSWorkspace.shared.open(provider.usageURL) } label: {
-                    Image(systemName: provider == .claude ? "sparkle" : "terminal.fill").font(.system(size: 20)).foregroundStyle(tint).frame(width: 22, height: 22).padding(10).background(tint.opacity(0.16), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(tint.opacity(0.25)))
-                        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    Image(systemName: provider == .claude ? "sparkle" : "terminal.fill").font(.system(size: 15)).foregroundStyle(tint).frame(width: 18, height: 18).padding(7).background(tint.opacity(0.16), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).strokeBorder(tint.opacity(0.25)))
+                        .contentShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
                 }.buttonStyle(.plain)
                     .onHover { inside in (inside ? NSCursor.pointingHand : NSCursor.arrow).set() }
                     .help("在瀏覽器開啟 \(provider.name) 用量頁面")
                     .accessibilityLabel("開啟 \(provider.name) 用量網頁")
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(provider.name).font(.system(size: 17, weight: .semibold))
-                    Text(store.preview ? "示範模式" : state.snapshot?.plan ?? "訂閱額度").font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(provider.name).font(.system(size: 14, weight: .semibold))
+                    Text(store.preview ? "示範模式" : state.snapshot?.plan ?? "訂閱額度").font(.system(size: 11)).foregroundStyle(Theme.secondary)
                 }
                 Spacer()
                 Text(store.preview ? "示範" : state.loading ? "更新中" : state.failed ? "待連線" : state.snapshot == nil ? "未連接" : "已連接")
-                    .font(.system(size: 11, weight: .medium)).padding(.horizontal, 9).padding(.vertical, 5)
-                    .glass(cornerRadius: 11, material: nil, elevated: false)
+                    .font(.system(size: 10, weight: .medium)).padding(.horizontal, 8).padding(.vertical, 4)
+                    .glass(cornerRadius: 10, material: nil, elevated: false)
             }
             if let snapshot = state.snapshot {
                 ForEach(snapshot.quotas) { quota in
@@ -199,26 +199,26 @@ struct ProviderCard: View {
                             if index > 0 { Divider() }
                             CreditView(credit: credit)
                         }
-                    }.padding(.horizontal, 12).glass(cornerRadius: 12, material: nil, elevated: false)
+                    }.padding(.horizontal, 10).glass(cornerRadius: 10, material: nil, elevated: false)
                 }
                 if stale {
                     Label("上次成功資料 · 目前可能已變動", systemImage: "clock.badge.exclamationmark")
-                        .font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                        .font(.system(size: 11)).foregroundStyle(Theme.secondary)
                 }
             } else {
-                VStack(spacing: 12) {
-                    Image(systemName: state.loading ? "network" : "link.badge.plus").font(.system(size: 30, weight: .light)).foregroundStyle(Theme.secondary)
-                    Text(state.loading ? "正在讀取額度" : "連接你的 \(provider.name)").font(.system(size: 16, weight: .medium))
+                VStack(spacing: 8) {
+                    Image(systemName: state.loading ? "network" : "link.badge.plus").font(.system(size: 24, weight: .light)).foregroundStyle(Theme.secondary)
+                    Text(state.loading ? "正在讀取額度" : "連接你的 \(provider.name)").font(.system(size: 14, weight: .medium))
                     Text("使用本機 \(provider == .claude ? "Claude Code" : "Codex") 的登入狀態\n不需要 API key 或瀏覽器")
-                        .font(.system(size: 13)).foregroundStyle(Theme.secondary).multilineTextAlignment(.center)
-                }.frame(maxWidth: .infinity).padding(.vertical, 25)
+                        .font(.system(size: 12)).foregroundStyle(Theme.secondary).multilineTextAlignment(.center)
+                }.frame(maxWidth: .infinity).padding(.vertical, 14)
             }
             if state.failed || store.preview {
-                Text(state.message).font(.system(size: 12)).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
+                Text(state.message).font(.system(size: 11)).foregroundStyle(Theme.secondary).fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(16)
-        .glass(cornerRadius: 20, material: .ultraThinMaterial, liquid: true)
+        .padding(12)
+        .glass(cornerRadius: 16, material: .ultraThinMaterial, liquid: true)
     }
 }
 
@@ -226,12 +226,12 @@ struct CreditView: View {
     let credit: Credit
     func money(_ value: Double) -> String { value.formatted(.currency(code: credit.currency ?? "USD")) }
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 2) {
             HStack(alignment: .firstTextBaseline) {
-                Text(credit.title).font(.system(size: 13, weight: .medium))
+                Text(credit.title).font(.system(size: 12, weight: .medium))
                 Spacer()
                 if let balance = credit.balance, let limit = credit.limit {
-                    Text("剩餘 \(money(balance)) / \(money(limit))").font(.system(size: 13, weight: .semibold)).monospacedDigit()
+                    Text("剩餘 \(money(balance)) / \(money(limit))").font(.system(size: 12, weight: .semibold)).monospacedDigit()
                 } else if credit.balance == nil, credit.resetsAt == nil {
                     Text(credit.detail).font(.system(size: 12)).foregroundStyle(Theme.secondary)
                 }
@@ -244,7 +244,7 @@ struct CreditView: View {
                     .font(.system(size: 12)).foregroundStyle(Theme.secondary).monospacedDigit()
             }
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 7)
         .accessibilityElement(children: .combine)
     }
 }
@@ -255,15 +255,15 @@ struct QuotaView: View {
     let tint: Color
     var accent: Color { (quota.remaining ?? 100) <= 10 ? .red : (quota.remaining ?? 100) <= 20 ? .orange : tint }
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
-                Text(quota.title).font(.system(size: 13, weight: .medium)).fixedSize(horizontal: false, vertical: true)
+                Text(quota.title).font(.system(size: 12, weight: .medium)).fixedSize(horizontal: false, vertical: true)
                 Spacer()
                 if let remaining = quota.remaining {
-                    HStack(alignment: .firstTextBaseline, spacing: 3) {
-                        Text("剩餘").font(.system(size: 11)).foregroundStyle(Theme.secondary)
-                        Text(remaining.formatted(.number.precision(.fractionLength(0...1)))).font(.system(size: 29, weight: .semibold, design: .rounded)).monospacedDigit()
-                        Text("%").font(.system(size: 14)).foregroundStyle(Theme.secondary)
+                    HStack(alignment: .firstTextBaseline, spacing: 2) {
+                        Text("剩餘").font(.system(size: 10)).foregroundStyle(Theme.secondary)
+                        Text(remaining.formatted(.number.precision(.fractionLength(0...1)))).font(.system(size: 20, weight: .semibold, design: .rounded)).monospacedDigit()
+                        Text("%").font(.system(size: 11)).foregroundStyle(Theme.secondary)
                     }
                 } else { Text("未知").foregroundStyle(Theme.secondary) }
             }
@@ -275,7 +275,7 @@ struct QuotaView: View {
                         .frame(width: geometry.size.width * (quota.remaining ?? 0) / 100)
                         .shadow(color: (stale ? Color.gray : accent).opacity(0.45), radius: 4)
                 }
-            }.frame(height: 7)
+            }.frame(height: 6)
                 .accessibilityLabel("\(quota.title)剩餘額度")
                 .accessibilityValue(quota.remaining.map { "\(Int($0))%" } ?? "未知")
             if let reset = quota.resetsAt {
@@ -283,13 +283,13 @@ struct QuotaView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.clockwise")
                         Text(reset <= context.date ? "重置時間已到 · 等待查詢" : "\(reset.formatted(.dateTime.month(.twoDigits).day(.twoDigits).hour().minute())) 重置")
-                    }.font(.system(size: 12)).foregroundStyle(Theme.secondary)
+                    }.font(.system(size: 11)).foregroundStyle(Theme.secondary)
                 }
-            } else { Text("重置時間尚未提供").font(.system(size: 12)).foregroundStyle(Theme.secondary) }
+            } else { Text("重置時間尚未提供").font(.system(size: 11)).foregroundStyle(Theme.secondary) }
             if let remaining = quota.remaining, remaining <= 20 {
-                Label("額度偏低", systemImage: "exclamationmark.circle").font(.system(size: 12)).foregroundStyle(.primary)
+                Label("額度偏低", systemImage: "exclamationmark.circle").font(.system(size: 11)).foregroundStyle(.primary)
             }
-        }.padding(.vertical, 8)
+        }.padding(.vertical, 4)
     }
 }
 

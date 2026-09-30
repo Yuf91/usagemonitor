@@ -55,7 +55,7 @@ if let flag = CommandLine.arguments.firstIndex(of: "--render-preview"), flag + 1
         let store = UsageStore(preview: true)
         // --settings renders the settings window at a short height to check that it scrolls
         let settings = CommandLine.arguments.contains("--settings")
-        let size = settings ? NSSize(width: 470, height: 520) : NSSize(width: 390, height: 720)
+        let size = settings ? NSSize(width: 470, height: 520) : NSSize(width: 330, height: 560)
         let panel: AnyView = settings ? AnyView(SettingsPanel(store: store)) : AnyView(UsagePanel(store: store, openSettings: {}))
         let view = panel.environment(\.colorScheme, dark ? .dark : .light).frame(width: size.width, height: size.height)
         let hosting = NSHostingView(rootView: view)
@@ -111,7 +111,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover = NSPopover()
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: UsagePanel(store: store, openSettings: { [weak self] in self?.showSettings() }))
-        popover.contentSize = NSSize(width: 390, height: 720)
+        popover.contentSize = NSSize(width: 330, height: 560)
         if CommandLine.arguments.contains("--preview") || CommandLine.arguments.contains("--window") {
             let controller = NSHostingController(rootView: UsagePanel(store: store, openSettings: { [weak self] in self?.showSettings() }))
             let window = NSWindow(contentViewController: controller)
@@ -120,7 +120,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.titlebarAppearsTransparent = true
             window.isOpaque = false
             window.backgroundColor = .clear
-            window.setContentSize(NSSize(width: 390, height: 720))
+            window.setContentSize(NSSize(width: 330, height: 560))
             window.center(); window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             previewWindow = window

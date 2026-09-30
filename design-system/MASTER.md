@@ -2,7 +2,7 @@
 依據：專案的 ui-ux-pro-max skill；已執行兩次 design-system 搜尋與 swiftui accessibility/state 查詢。
 搜尋回傳的 Hero/CTA 網頁布局不適用選單列，因此不採用；以下為平台適配後的一般設計規範，非資料庫確認的專用選單列模板。
 
-- 原生 macOS 選單列 + SwiftUI 面板，寬 390pt；垂直內容，最大高度依螢幕限制。
+- 原生 macOS 選單列 + SwiftUI 面板，寬 330pt；垂直內容，最大高度依螢幕限制。
 - 系統字體與 SF Symbols，數值 monospacedDigit。標題 22pt、服務名 16pt、內文 13pt、附註 12pt。
 - 8/12/16/20pt 間距，卡片圓角 16pt，系統背景／文字語意色彩。Claude 用橘色、Codex 用藍色做裝飾與進度，不作唯一狀態指示；剩餘 ≤20%／10% 時進度條改橘／紅並加文字。
 - 面板：標題 → Claude 卡片（本次、本週、credits 區塊）→ Codex 卡片 → 更新時間與操作。
