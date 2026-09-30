@@ -1,6 +1,6 @@
 # Validation
 
-Version 1.2.0 · 2026-09-30
+Version 1.2.1 · 2026-10-01
 
 Verified:
 - Universal (arm64 + x86_64) release build, ad-hoc signature verified.

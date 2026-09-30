@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 BUNDLE_ID="${BUNDLE_ID:-io.github.yuf91.usagemonitor}"
-VERSION="${VERSION:-1.2.0}"
-BUILD_NUMBER="${BUILD_NUMBER:-3}"
+VERSION="${VERSION:-1.2.1}"
+BUILD_NUMBER="${BUILD_NUMBER:-4}"
 ARCHS="${ARCHS:-arm64 x86_64}"
 
 export CLANG_MODULE_CACHE_PATH="$PWD/.build/clang-cache"

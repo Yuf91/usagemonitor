@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build universal app and run self-tests
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then export VERSION="${GITHUB_REF_NAME#v}"; fi
+          export BUILD_NUMBER="$GITHUB_RUN_NUMBER"
+          export BUNDLE_ID="io.github.$(echo "$GITHUB_REPOSITORY_OWNER" | tr A-Z a-z).usagemonitor"
+          bash scripts/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AIUsageBar
+          path: dist/*.zip
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # A release created in the web UI already exists, so attach the zip to it instead
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/*.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/*.zip --title "$GITHUB_REF_NAME" --generate-notes
+          fi
