@@ -2,7 +2,7 @@ import Foundation
 
 /// Reads Claude subscription usage with the login Claude Code already stores in the Keychain.
 /// The token stays in memory for one request; it is never saved, logged or refreshed by this app.
-/// Token refresh is left to Claude Code itself (`claude auth status`), so its stored login is never raced.
+/// Token refresh is left to Claude Code itself (`claude mcp list`), so its stored login is never raced.
 struct ClaudeClient {
     static func executable() -> String? {
         let home = NSHomeDirectory()
@@ -38,9 +38,12 @@ struct ClaudeClient {
         return Credential(token: token, expiresAt: expiry, plan: oauth["subscriptionType"] as? String)
     }
 
+    /// `claude auth status` only reads the stored login and never renews it, so an idle CLI left the token expired.
+    /// `claude mcp list` loads the claude.ai connectors, which makes Claude Code renew and store the token itself,
+    /// without sending a prompt or using any quota.
     private static func refreshThroughClaudeCode() {
         guard let path = executable() else { return }
-        _ = run(path, ["auth", "status"], timeout: 20)
+        _ = run(path, ["mcp", "list"], timeout: 60)
     }
 
     private static func request(_ credential: Credential) throws -> Snapshot {

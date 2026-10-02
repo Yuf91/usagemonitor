@@ -4,17 +4,20 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 BUNDLE_ID="${BUNDLE_ID:-io.github.yuf91.usagemonitor}"
-VERSION="${VERSION:-1.2.1}"
-BUILD_NUMBER="${BUILD_NUMBER:-4}"
+VERSION="${VERSION:-1.2.2}"
+BUILD_NUMBER="${BUILD_NUMBER:-5}"
 ARCHS="${ARCHS:-arm64 x86_64}"
 
-export CLANG_MODULE_CACHE_PATH="$PWD/.build/clang-cache"
-export SWIFTPM_MODULECACHE_OVERRIDE="$PWD/.build/swift-cache"
+# Module caches run to hundreds of MB per architecture, so keep them out of the project and delete them afterwards.
+CACHE="$(mktemp -d)"
+trap 'rm -rf "$CACHE"' EXIT
+export CLANG_MODULE_CACHE_PATH="$CACHE/clang"
+export SWIFTPM_MODULECACHE_OVERRIDE="$CACHE/swiftpm"
 mkdir -p .build/release
 python3 scripts/compiler-overlay.py
 slices=()
 for arch in $ARCHS; do
-    xcrun swiftc -vfsoverlay "$PWD/.build/compiler-overlay.json" -O -swift-version 5 -target "$arch-apple-macosx13.0" -module-cache-path "$PWD/.build/swift-cache-$arch" Sources/AIUsageBar/*.swift -o ".build/release/AIUsageBar-$arch"
+    xcrun swiftc -vfsoverlay "$PWD/.build/compiler-overlay.json" -O -swift-version 5 -target "$arch-apple-macosx13.0" -module-cache-path "$CACHE/swift-$arch" Sources/AIUsageBar/*.swift -o ".build/release/AIUsageBar-$arch"
     slices+=(".build/release/AIUsageBar-$arch")
 done
 lipo -create "${slices[@]}" -output .build/release/AIUsageBar
